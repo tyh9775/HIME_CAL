@@ -1,4 +1,4 @@
-#include "myConst3.h"
+#include "../myConst.h"
 #include <TFile.h>
 #include <TGraph.h>
 #include <TCanvas.h>
@@ -206,12 +206,11 @@ double avg_find(std::vector<double> v){
     return sum/v.size();
 }
 
-void single_cal_v3(
+void single_cal(
     const std::string &file = "input.root",
     const std::string &tfile = "input.txt",    
     const std::string &ofile = "output",
     const std::vector<std::string> &cuts = {"cut1.root","cut2.root","cut3.root"},
-    bool limit = true,
     bool He = false,
     const double E_min = En_min //set negative if ignoring
 ){
@@ -379,14 +378,11 @@ void single_cal_v3(
         g_E->SetMarkerStyle(20);
         TF1 *f_E = new TF1(Form("f_E_L%d",i),"[0]*([1]*exp([2]*x)+[3])",tot[0],tot[tot.size()-1]);
         f_E->SetParameters(0.1,0.1,0.1,0.1);
-        if (limit){
-            f_E->SetParLimits(0,0.0,10.0);
-            //f_E->FixParameter(0,1.0);
-            f_E->SetParLimits(1,0.0,1.0);
-            f_E->SetParLimits(2,0.0,1.0);
-            f_E->SetParLimits(3,0.0,1.0);
-            //f_E->SetParLimits(4,-5.0,5.0);
-        }
+
+        f_E->SetParLimits(0,0.0,10.0);
+        f_E->SetParLimits(1,0.0,1.0);
+        f_E->SetParLimits(2,0.0,1.0);
+        f_E->SetParLimits(3,0.0,1.0);
 
         g_E->Fit(f_E,"R");
 
@@ -416,14 +412,10 @@ void single_cal_v3(
         g2_E->SetMarkerStyle(20);
         TF1 *f2_E = new TF1(Form("f2_E_L%d",i),"[0]*([1]*exp([2]*x)+[3])",tot2[0],tot2[tot2.size()-1]);
         f2_E->SetParameters(0.1,0.1,0.1,0.1);
-        if (limit){
-            f2_E->SetParLimits(0,0.0,10.0);
-            //f2_E->FixParameter(0,1.0);
-            f2_E->SetParLimits(1,0.0,1.0);
-            f2_E->SetParLimits(2,0.0,1.0);
-            f2_E->SetParLimits(3,0.0,1.0);
-            //f2_E->SetParLimits(4,-5.0,5.0);
-        }
+        f2_E->SetParLimits(0,0.0,10.0);
+        f2_E->SetParLimits(1,0.0,1.0);
+        f2_E->SetParLimits(2,0.0,1.0);
+        f2_E->SetParLimits(3,0.0,1.0);
         g2_E->Fit(f2_E,"R");
 
         fo1->cd();

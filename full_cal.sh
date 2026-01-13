@@ -11,22 +11,17 @@ set -e
 #switches for running different parts of the code
 original=false #run Kin's original code
 mu_st=true #load and combine cosmic muon data
-single=true #run the single detector estimation
-load=0 #for loading given data for calibration
-cal=0 #for applying the calibration parameters
-recut=0 #for automatically remaking tcutg files 
-amp_e=0 #calibrating amplitude to energy
-ecal=0 #creating E vs tot graphs
-vis=0
-muon=0
-veto=0
+single=false #run the single detector estimation
+load=false #for loading given data for calibration
+cal=false #for applying the calibration parameters
+recut=false #for automatically remaking tcutg files 
+amp_e=false #calibrating amplitude to energy
+ecal=false #creating E vs tot graphs
+
 read=1
 
-
 #switches for different output options
-limit=true
 Hel=false
-E_min=-1 # neg = don't use; zero = use val in myConst; pos = use given value
 
 
 #functions####################################################################################
@@ -59,113 +54,24 @@ get_double() {
 }
 ##############################################################################################
 
+#paths and filenames
+tot_code_dir="codes/tot_cal"
+sb_code_dir="codes/shadow_bar"
+
+mu_dir="cosmic_muons"
+mu_pattern="${mu_dir}/cosmics_layers_1_2_3_thr0x200_volt2024-06-25_00"
 
 result_dir="tot_cal_results"
-mkdir -p $result_dir
-
-En=$E_min
-vis_res="${amp_dir_0}/vis"
-if [ $E_min -lt 0 ]
-then
-    vis_res="${vis_res}_no_E"
-    amp_dir="${amp_dir}/no_E"
-elif [ $E_min == 0 ]
-then
-    En=$(get_double myConst3.h En_min)
-    vis_res="${vis_res}_min_E"
-    amp_dir="${amp_dir}/min_E"
-else
-    vis_res="${vis_res}_min_E_cust"
-    amp_dir="${amp_dir}/min_E_cust"
-fi
-
 if [ $Hel == true ]
 then
-    vis_res="${vis_res}_He"
-    amp_dir="${amp_dir}_He"
+    result_dir="${result_dir}/He"
 else 
-    vis_res="${vis_res}_no_He"
-    amp_dir="${amp_dir}_no_He"
+    result_dir="${result_dir}/no_He"
 fi
 
-vis_res_2="${vis_res}_v2"
+sc="${result_dir}/single_cal"
 
-mkdir -p $amp_dir
 
-og_file="./hime/results/gain_matching/june-walk.root"
-#og_file="./sb_results/gain_matching/june-walk.root" #if new loaded data is needed, use reload.sh
-sb_res="${result_dir}/june"
-amp_res="${amp_dir}/june"
-amp_res_0="${amp_dir_0}/june"
-
-if [ $all == 1 ]
-then
-    sb_res="${result_dir}/all"
-    amp_res="${amp_dir}/all"
-    amp_res_0="${amp_dir_0}/all"
-    og_file="./hime/results/gain_matching/all-walk.root"
-    #og_file="./sb_results/gain_matching/all-walk.root"
-fi
-
-tt_cut0="./TCuts/tt_L0.root"
-tt_cut1="./TCuts/tt_L1.root"
-tt_cut2="./TCuts/tt_L2.root"
-
-E_cut0="./TCuts/E_L0.root"
-E_cut1="./TCuts/E_L1.root"
-E_cut2="./TCuts/E_L2.root"
-
-ar_sc="${amp_res}-single-cal"
-ar_par="${amp_res}-parameters"
-ar_par_2="${amp_res}-parameters-v2"
-ar_clb="${amp_res}-clb.root"
-ar_clb_2="${amp_res}-clb_2.root"
-ar_a_t="${amp_res}-a-t.root"
-ar_a_t_2="${amp_res}-a-t-2.root"
-ar_ae="${amp_res}-amp-E"
-ar_ae_2="${amp_res}-amp-E-v2"
-cut_dir="${amp_dir}/cuts"
-mkdir -p $cut_dir
-ar_cut0="${cut_dir}/amp_L0.root"
-ar_cut1="${cut_dir}/amp_L1.root"
-ar_cut2="${cut_dir}/amp_L2.root"
-ar_cut0_v2="${cut_dir}/amp_L0_v2.root"
-ar_cut1_v2="${cut_dir}/amp_L1_v2.root"
-ar_cut2_v2="${cut_dir}/amp_L2_v2.root"
-ar_sp="${amp_res}_simple"
-ar_sp_2="${amp_res}_simple_v2"
-ar_sv="${amp_res}_simple_vis"
-ar_sv_2="${amp_res}_simple_vis_2"
-ar_mu="${amp_res}_mu"
-ar_mu_2="${amp_res}_mu_2"
-
-if [ "$limit" == true ]
-then
-    ar_sc="${amp_res}-single-cal-lim"
-    ar_par="${amp_res}-parameters-lim"
-    ar_par_2="${amp_res}-parameters-v2-lim"
-    ar_clb="${amp_res}-clb-lim.root"
-    ar_clb_2="${amp_res}-clb_2-lim.root"
-    ar_a_t="${amp_res}-a-t-lim.root"
-    ar_a_t_2="${amp_res}-a-t-2-lim.root"
-    ar_ae="${amp_res}-amp-E-lim"
-    ar_ae_2="${amp_res}-amp-E-v2-lim"
-    ar_cut0="${cut_dir}/amp_L0_lim.root"
-    ar_cut1="${cut_dir}/amp_L1_lim.root"
-    ar_cut2="${cut_dir}/amp_L2_lim.root"
-    ar_cut0_v2="${cut_dir}/amp_L0_v2_lim.root"
-    ar_cut1_v2="${cut_dir}/amp_L1_v2_lim.root"
-    ar_cut2_v2="${cut_dir}/amp_L2_v2_lim.root"
-    ar_sp="${amp_res}_simple_lim"
-    ar_sp_2="${amp_res}_simple_v2_lim"
-    ar_sv="${amp_res}_simple_vis_lim"
-    ar_sv_2="${amp_res}_simple_vis_2_lim"
-    ar_mu="${amp_res}_mu_lim"
-    ar_mu_2="${amp_res}_mu_2_lim"
-
-    vis_res="${vis_res}_lim"
-    vis_res_2="${vis_res_2}_lim"
-fi
 
 runs23=( 1148 1149 1150 1151 1152 1153 1154 1155 1156 1158 1160 1161 1162 1163 1164 1165 1166 1167 1168 1169 1170 1171 1172 1174 1175 1176 1178 1179 1180 1181 1182 1183 1184 1185 1186 1189 1190 1191 1192 1195 1196 1197 1198 1199 1200 1201 1202 1203 1204 1205 1206 1207 1208 1210 )
 
@@ -204,34 +110,23 @@ runs_all=$( IFS=, ; echo "${runs_all[*]}" )
 
 
 
-if [ $all == 1 ]
+if [ $original == true ] 
 then
-    runs=$runs_all
-    runs_2=$runs_a_2 
-    runs_3=$runs_a_3 
-    runs_4=$runs_a_4 
-
-    runs_2_inc=$runs_a_2_inc 
-    runs_3_inc=$runs_a_3_inc 
-    runs_4_inc=$runs_a_4_inc 
+    root -l -b -q "${sb_code_dir}/shadowAna.C({$runs}, \"${sb_res}-shadow-og.root\", true, false)"
+    root -l -b -q "${sb_code_dir}/shadowAna.C({$runs}, \"${sb_res}-shadow-vw-og.root\", true, true)"
 fi
 
-if [ $original == 1 ] 
+if [ $mu_st == true ]
 then
-    root -l -b -q "shadowAna.C({$runs}, \"${sb_res}-shadow-og.root\", true, false)"
-    root -l -b -q "shadowAna.C({$runs}, \"${sb_res}-shadow-vw-og.root\", true, true)"
-fi
-
-if [ $mu_st == 1 ]
-then
-    root -b -q -l "muon_load.cpp(\"ma.root\",\"mu_ld\")"
+    root -b -q -l "${tot_code_dir}/muon_add.cpp(\"${mu_pattern}\",\"${mu_dir}/ma.root\")"
+    root -b -q -l "${tot_code_dir}/muon_load.cpp(\"${mu_dir}/ma.root\",\"${mu_dir}/mu_ld\")"
 fi
 
 
-if [ $single == 1 ] 
+if [ $single == true ] 
 then
-    #root -b -q -l "single_v2.cpp({$runs},\"${amp_res_0}-single.root\",{14,38,62},true,false)"
-    root -b -q -l "single_cal_v3.cpp(\"${amp_res_0}-single.root\",\"mu_ld.txt\",\"$ar_sc\",{\"$tt_cut0\",\"$tt_cut1\",\"$tt_cut2\"},$limit,$Hel,$En)"
+    root -b -q -l "single.cpp({$runs_all},\"${result_dir}/single.root\",{14,38,62},true,false)"
+    root -b -q -l "single_cal.cpp(\"${amp_res_0}-single.root\",\"mu_ld.txt\",\"$ar_sc\",{\"$tt_cut0\",\"$tt_cut1\",\"$tt_cut2\"},$Hel,$En)"
 fi
 
 a_pars=()   
