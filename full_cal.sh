@@ -10,8 +10,8 @@ set -e
 
 #switches for running different parts of the code
 original=false #run Kin's original code
-mu_st=true #load and combine cosmic muon data
-single=false #run the single detector estimation
+mu_st=false #load and combine cosmic muon data
+single=true #run the single detector estimation
 load=false #for loading given data for calibration
 cal=false #for applying the calibration parameters
 recut=false #for automatically remaking tcutg files 
@@ -21,7 +21,7 @@ ecal=false #creating E vs tot graphs
 read=1
 
 #switches for different output options
-Hel=false
+Hel=true
 
 
 #functions####################################################################################
@@ -62,14 +62,18 @@ mu_dir="cosmic_muons"
 mu_pattern="${mu_dir}/cosmics_layers_1_2_3_thr0x200_volt2024-06-25_00"
 
 result_dir="tot_cal_results"
+mkdir -p $result_dir
+
 if [ $Hel == true ]
 then
-    result_dir="${result_dir}/He"
+    res_dir="${result_dir}/He"
+    mkdir -p "$res_dir"
 else 
-    result_dir="${result_dir}/no_He"
+    res_dir="${result_dir}/no_He"
+    mkdir -p "$res_dir"
 fi
 
-sc="${result_dir}/single_cal"
+s_est="${res_dir}/single_estimate"
 
 
 
@@ -125,8 +129,8 @@ fi
 
 if [ $single == true ] 
 then
-    root -b -q -l "single.cpp({$runs_all},\"${result_dir}/single.root\",{14,38,62},true,false)"
-    root -b -q -l "single_cal.cpp(\"${amp_res_0}-single.root\",\"mu_ld.txt\",\"$ar_sc\",{\"$tt_cut0\",\"$tt_cut1\",\"$tt_cut2\"},$Hel,$En)"
+    #root -b -q -l "${tot_code_dir}/single.cpp({$runs_all},\"${result_dir}/single.root\",{14,38,62},true,false)"
+    root -b -q -l "${tot_code_dir}/single_estimate.cpp(\"${result_dir}/single.root\",\"${mu_dir}/mu_ld.txt\",\"$s_est\",\"./TCuts/l\",$Hel)"
 fi
 
 a_pars=()   

@@ -1,9 +1,5 @@
 #!/bin/bash
 
-root -b -q -l "cut_load.cpp({\"E_s1_L0.C\",\"E_s2_L0.C\",\"E_s3_L0.C\",\"E_s4_L0.C\",\"E_s5_L0.C\"},\"E_L0.root\")"
-root -b -q -l "cut_load.cpp({\"E_s1_L1.C\",\"E_s2_L1.C\",\"E_s3_L1.C\",\"E_s4_L1.C\",\"E_s5_L1.C\"},\"E_L1.root\")"
-root -b -q -l "cut_load.cpp({\"E_s1_L2.C\",\"E_s2_L2.C\",\"E_s3_L2.C\",\"E_s4_L2.C\",\"E_s5_L2.C\"},\"E_L2.root\")"
-
-root -b -q -l "cut_load.cpp({\"tt_s1_L0.C\",\"tt_s2_L0.C\",\"tt_s3_L0.C\",\"tt_s4_L0.C\",\"tt_s5_L0.C\"},\"tt_L0.root\")"
-root -b -q -l "cut_load.cpp({\"tt_s1_L1.C\",\"tt_s2_L1.C\",\"tt_s3_L1.C\",\"tt_s4_L1.C\",\"tt_s5_L1.C\"},\"tt_L1.root\")"
-root -b -q -l "cut_load.cpp({\"tt_s1_L2.C\",\"tt_s2_L2.C\",\"tt_s3_L2.C\",\"tt_s4_L2.C\",\"tt_s5_L2.C\"},\"tt_L2.root\")"
+root -b -q -l "cut_load.cpp({\"l0s1.C\",\"l0s2.C\",\"l0s3.C\",\"l0s4.C\",\"l0s5.C\"},\"l0.root\")"
+root -b -q -l "cut_load.cpp({\"l1s1.C\",\"l1s2.C\",\"l1s3.C\",\"l1s4.C\",\"l1s5.C\"},\"l1.root\")"
+root -b -q -l "cut_load.cpp({\"l2s1.C\",\"l2s2.C\",\"l2s3.C\",\"l2s4.C\",\"l2s5.C\"},\"l2.root\")"

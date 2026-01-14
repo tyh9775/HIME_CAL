@@ -38,30 +38,33 @@ double mu_tot0 {21.0};
 double mu_tot1 {19.5};
 double mu_tot2 {20.5};
 
+
+//punch through tof estimated by eye
+double pro_tof_0 {25.4};
+double deu_tof_0 {32.6};
+double tri_tof_0 {37.2};
+double hel_tof_0 {20.8};
+double alp_tof_0 {23.4};
+
+double pro_tof_1 {21.4};
+double deu_tof_1 {27.8};
+double tri_tof_1 {32.2};
+double hel_tof_1 {17.6};
+double alp_tof_1 {20.0};
+
+double pro_tof_2 {19.2};
+double deu_tof_2 {25.2};
+double tri_tof_2 {29.2};
+double hel_tof_2 {15.4};
+double alp_tof_2 {17.6};
+
+
 //BC408 can detect x rays of energies <100keV (around 10% E res around here)
 double En_min {0.1};
 double En_min_err {0.01};
 
 double num_ent = 13215485.0;
 //punch though points (estimated by eye)
-/* std::vector<double> pro_0 {26.0,25.5};
-std::vector<double> deu_0 {33.2,26.5};
-std::vector<double> tri_0 {37.8,27.0};
-std::vector<double> hel_0 {21.6,30.0};
-std::vector<double> alp_0 {24.4,30.5}; 
-
-std::vector<double> pro_1 {21.8,24.0};
-std::vector<double> deu_1 {28.2,25.0};
-std::vector<double> tri_1 {33.4,25.5};
-std::vector<double> hel_1 {18.2,28.5};
-std::vector<double> alp_1 {20.6,29.0};
-
-std::vector<double> pro_2 {19.8,25.0};
-std::vector<double> deu_2 {25.8,25.5};
-std::vector<double> tri_2 {30.2,26.5};
-std::vector<double> hel_2 {16.2,29.0};
-std::vector<double> alp_2 {18.2,30.0};*/
-
 
 std::vector<double> pro_0 {25.4,25.5};
 std::vector<double> deu_0 {32.8,26.4};
@@ -81,9 +84,13 @@ std::vector<double> tri_2 {30.2,26.7};
 std::vector<double> hel_2 {16.0,29.6};
 std::vector<double> alp_2 {18.4,30.1};
 
-std::vector<double> L0_tof {pro_0[0],deu_0[0],tri_0[0],hel_0[0],alp_0[0]};
+/* std::vector<double> L0_tof {pro_0[0],deu_0[0],tri_0[0],hel_0[0],alp_0[0]};
 std::vector<double> L1_tof {pro_1[0],deu_1[0],tri_1[0],hel_1[0],alp_1[0]};
-std::vector<double> L2_tof {pro_2[0],deu_2[0],tri_2[0],hel_2[0],alp_2[0]};
+std::vector<double> L2_tof {pro_2[0],deu_2[0],tri_2[0],hel_2[0],alp_2[0]}; */
+
+std::vector<double> L0_tof {pro_tof_0,deu_tof_0,tri_tof_0,hel_tof_0,alp_tof_0};
+std::vector<double> L1_tof {pro_tof_1,deu_tof_1,tri_tof_1,hel_tof_1,alp_tof_1};
+std::vector<double> L2_tof {pro_tof_2,deu_tof_2,tri_tof_2,hel_tof_2,alp_tof_2};
 
 
 // (m/ns)^2 = (J/kg)/(10^-9)^2 = (6241509074461 MeV / 6.0221366516752E+26 u) * (10^18) = 10364.27673 MeV/u

@@ -1,4 +1,4 @@
-#include "spirit.h"
+#include "../spirit.h"
 #include "../myConst.h"
 #include <TSpectrum.h>
 
@@ -65,7 +65,7 @@ void single(
 
     const std::vector<int>& requiredLayers = {0,1,2},
     // const std::string& tofOffsetFile = "./hime/database/calibration/tof/tof_offset.json",
-    const std::string& tofOffsetFile = "hime/database/calibration/tof/time_offsets_experiment_gaus.txt",
+    const std::string& tofOffsetFile = "codes/time_offsets_experiment_gaus.txt",
     const double timeSbtLeft = -110.8,
 
     const int hitPatternBins = 200,
@@ -76,10 +76,10 @@ void single(
 	//const std::string &velocityFile = "hime/database/velocity_marco.txt",
 
 
-	const std::string &tdiffOffsetFile = "hime/database/calibration/tdiff/position-calib-muon.json",
-	
-	
-	const std::string &modulePositionFilename = "hime/database/test.txt"
+	const std::string &tdiffOffsetFile = "codes/position-calib-muon.json",
+
+
+	const std::string &modulePositionFilename = "codes/positions.txt"
     //const std::string &modulePositionFilename = "hime/database/module_positions.dat"
 
 	// clang-format on
