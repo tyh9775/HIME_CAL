@@ -85,10 +85,10 @@ void single_estimate(
         TH2D *h = (TH2D*)f->Get(Form("hTotVsTof_det%d",hbases[i]));
         TFile *fcut = new TFile((cut_pattern+std::to_string(i)+".root").c_str(),"READ");
 
-        for (int j=1;j<=num_sec;j++){
-            double tof_j = tofs[i][j-1];
+        for (int j=0;j<num_sec;j++){
+            double tof_j = tofs[i][j];
             int tof_j_bin = h->GetXaxis()->FindBin(tof_j);
-            TH1D *py = (TH1D*)h->ProjectionY(Form("py_L%d_s%d",i,j),tof_j_bin-1,tof_j_bin+1);
+            TH1D *py = (TH1D*)h->ProjectionY(Form("py_L%d_s%d",i,j+1),tof_j_bin-1,tof_j_bin+1);
             py->SetTitle(Form("Y Proj at ToF %.1f",tof_j));
 
             TCutG *cut = (TCutG*)fcut->Get(Form("cut_s%d",j));

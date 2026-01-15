@@ -9,10 +9,10 @@
 set -e
 
 #switches for running different parts of the code
-original=true #run Kin's original code
+original=false #run Kin's original code
 mu_st=false #load and combine cosmic muon data
 single=false #run the single detector estimation
-load=false #for loading given data for calibration
+load=true #for loading given data for calibration
 cal=false #for applying the calibration parameters
 recut=false #for automatically remaking tcutg files 
 amp_e=false #calibrating amplitude to energy
@@ -115,11 +115,11 @@ then
 fi
 
 
-if [ $load == 1 ]
-then   
-    root -b -q -l "mult_loader.cpp(\"${sb_res}-shadow-og.root\",\"ml.root\",{\"${cut_file1}\",\"${cut_file2}\",\"${cut_file3}\"})"
-    root -b -q -l "ToT_cal_v5.cpp(\"ml.root\",\"${ar_clb}\",\"$ar_par\",true,$a_mat)"
-    root -b -q -l "ToT_cal_v5.cpp(\"ml.root\",\"${ar_clb_2}\",\"$ar_par_2\",true,$a_mat_2)"
+if [ $load == true ]
+then
+    root -b -q -l "${tot_code_dir}/mult_loader.cpp(\"${result_dir}/og.root\",\"${res_dir}/ml.root\",\"./TCuts/cal_l\")"
+    #root -b -q -l "ToT_cal.cpp(\"ml.root\",\"${ar_clb}\",\"$ar_par\",true,$a_mat)"
+
 fi
 
 if [ $cal == 1 ]

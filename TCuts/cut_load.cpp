@@ -14,7 +14,7 @@ void cut_load(
     for (size_t i=0;i<cuts.size();i++){
         std:: string cut_exc = ".x ";
         gROOT->ProcessLine((cut_exc+cuts[i]).c_str());
-        std::string cut_name = "cut_s" + to_string(i+1);
+        std::string cut_name = "cut_s" + to_string(i);
         TCutG *cut_i = (TCutG*)gROOT->FindObject("CUTG");
         cut_i->SetName(cut_name.c_str());
         f_out->cd();

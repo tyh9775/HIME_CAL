@@ -1,4 +1,4 @@
-#include "myConst3.h"
+#include "../myConst.h"
 #include <TH2F.h>
 #include <TCanvas.h>
 #include <TFile.h>
@@ -150,10 +150,10 @@ std::vector<std::vector<double>> data_load(const TH2D *h,const TCutG *cut){
 }
 
 //need to adjust the x ranges (use the walk corrected ones to be more consistent)
-void mult_loader_v3(
+void mult_loader(
     const std::string &file = "input.root",
     const std::string &ofile = "output.root",
-    const std::vector<std::string> &cuts = {"cut1.root","cut2.root","cut3.root"},
+    const std::string &cut_pattern = "./TCuts/cal_l",
     bool cal=false,
     bool dyn_cut=true
 ){
@@ -176,9 +176,9 @@ void mult_loader_v3(
     } */
 
     TH2D *h_all = new TH2D("hTotVsTof_all","",2000, -100, 300, 150, 0, 75);
-    for (int L=0;L<3;L++){
+    for (int L=0;L<1;L++){
         //Graphical cuts
-        auto *fcut = new TFile(cuts[L].c_str(),"READ");
+        auto *fcut = new TFile((cut_pattern+to_string(L)+".root").c_str(),"READ");
         
         int num_sec {0};
         
@@ -206,7 +206,7 @@ void mult_loader_v3(
         if (!cal){
             hcopy0 = (TH2D*)f->Get(Form("hTotVsTofBar%d",hbases[L]));
             //find the offset for the cuts of the detectors by using the first section
-            TCutG *cut0 = (TCutG*)fcut->Get("cut_s1");
+            TCutG *cut0 = (TCutG*)fcut->Get("cut_s0");
             y0 = y_pt_find(hcopy0,cut0);         
         } else {
             hcopy0 = (TH2D*)f->Get(Form("hTotVsTofBar_sh_t%d",hbases[L]));
@@ -216,11 +216,12 @@ void mult_loader_v3(
         std::vector<int> degrees {};
 
         for (int j=0;j<num_sec;j++){
-            if (std::find(sec_omit.begin(),sec_omit.end(),j+1) != sec_omit.end()){
+            /* if (std::find(sec_omit.begin(),sec_omit.end(),j+1) != sec_omit.end()){
                 degrees.push_back(0);
                 continue;
-            }
+            } */
             TCutG *cutj = (TCutG*)fcut->Get(Form("cut_s%d",j+1));
+            std::cout<<j<<"\n";
             std::vector<std::vector<double>> data0 = data_load(hcopy0,cutj);
 
             double bic_start {1e6};
@@ -314,10 +315,10 @@ void mult_loader_v3(
             }
 
             for (int j=0;j<num_sec;j++){
-                if (std::find(sec_omit.begin(),sec_omit.end(),j+1) != sec_omit.end()){
+                /* if (std::find(sec_omit.begin(),sec_omit.end(),j+1) != sec_omit.end()){
                     continue;
                 }
-
+ */
                 TCutG *cut_ini = (TCutG*)fcut->Get(("cut_s"+to_string(j+1)).c_str());
                 TCutG *cut = (TCutG*)cut_ini->Clone();
 
@@ -331,16 +332,16 @@ void mult_loader_v3(
                 std::vector<std::vector<double>> data = data_load(hcopy,cut);
             
 
-                if (std::find(sec_omit.begin(),sec_omit.end(),j+1) != sec_omit.end()){
+                /* if (std::find(sec_omit.begin(),sec_omit.end(),j+1) != sec_omit.end()){
                     continue;
-                }
+                } */
                 int n_j = data[0].size();  
                 TGraphErrors* gj = new TGraphErrors(n_j,data[0].data(),data[1].data(),nullptr,data[2].data());
-                gj->SetName(Form("g_s%d_d%d",j+1,i));
+                gj->SetName(Form("g_s%d_d%d",j,i));
 
                 TF1 *fit_f = new TF1(Form("fit_deg_%d",degrees[j]),Form("pol%d",degrees[j]),data[0][0],data[0][n_j-1]);
-                
-                std::cout<<"section "<<j+1<<" best fit"<<"\n";
+
+                std::cout<<"section "<<j<<" best fit"<<"\n";
                 gj->Fit(fit_f,"R");
 
                 std::cout<<"****************************************"<<"\n";
