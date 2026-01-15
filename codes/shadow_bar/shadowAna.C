@@ -1,4 +1,6 @@
-#include "spirit.h"
+#include "../spirit.h"
+#include "../myConst.h"
+
 const int nLayers = 3;
 const int nModules = 72;
 const double barWidthInMeter = 0.04; // 40 mm
@@ -9,14 +11,15 @@ const double LAYER_DISTANCE = 0.06; // m
 const double barDepth = 2e-2;		// 2cm
 
 unsigned int getLayer(const unsigned int &hitModule);
-std::vector<double> getOffset(const std::string &filename);
+
+void getPositionCalibration(const std::string &filename, std::vector<double> &veff, std::vector<double> &offset);
+
+
 std::vector<double> getModulePositions(const std::string &filename);
 
-void loadTdiffOffset(
-	const std::string &filename, std::vector<double> &offset, std::vector<std::vector<double>> &gatedModules
-);
 
 void loadTofOffset(const std::string &filename, std::vector<double> &offset);
+
 
 void shadowAna(
 	// clang-format off
@@ -49,7 +52,7 @@ void shadowAna(
 
     const std::vector<int>& requiredLayers = {0,1,2},
     // const std::string& tofOffsetFile = "database/calibration/tof/tof_offset.json",
-    const std::string& tofOffsetFile = "hime/database/calibration/tof/time_offsets_experiment_gaus.txt",
+    const std::string& tofOffsetFile = "codes/time_offsets_experiment_gaus.txt",
 
     const double totThresh = 22.13,
     const double timeSbtLeft = -110.8,
@@ -60,33 +63,28 @@ void shadowAna(
 
     const int hitPatternBins = 200,
     const std::string &spiritDir="hime_riken_bdc",
-    const std::string &tdiffOffsetFile = "hime/database/calibration/tdiff/tdiff_offset.json",
-	const std::string &velocityFile = "hime/database/velocity_marco.txt",
-    const std::string &modulePositionFilename = "hime/database/module_positions.dat"
-
+	const std::string &tdiffOffsetFile = "codes/position-calib-muon.json",
+	const std::string &modulePositionFilename = "codes/positions.txt"
 	// clang-format on
 ) {
-
 	auto spiritChain = getSpiritChain(runIds, spiritDir);
 	auto spiritEntries = spiritChain->GetEntries();
-
+	std::cout << "Total entries: " << spiritEntries << "\n";
 
 	// load tdiff offset and velocity
-	auto velocity = getOffset(velocityFile);
+	std::vector<double> veff(nModules, 0.0);
+	std::vector<double> posOffset(nModules, 0.0);
+	getPositionCalibration(tdiffOffsetFile, veff, posOffset);
+
 	auto modulePositions = getModulePositions(modulePositionFilename);
 	for (auto i = 0; i < nModules; i++) {
 		modulePositions[i] *= 1000; // m -> mm
 	}
-	std::vector<double> posOffset;
-	std::vector<std::vector<double>> gatedModules;
-	loadTdiffOffset(tdiffOffsetFile, posOffset, gatedModules);
-	for (int i = 0; i < nModules; i++) {
-		posOffset[i] = -1. * posOffset[i] * velocity[i];
-	}
 
 	// load tof offset
 	std::vector<double> tofOffset;
-	loadTofOffset(tofOffsetFile, tofOffset);
+	loadTofOffset(tofOffsetFile, tofOffset); 
+
 
 	/****************************************************************************************************************/
 
@@ -200,24 +198,28 @@ void shadowAna(
 
 			auto tot = std::sqrt(spirit.hime_tot0[ihit] * spirit.hime_tot1[ihit]);
             // change the tot (calubarion)
-			auto tDiff = spirit.hime_tDiff[ihit] + posOffset[moduleId] / velocity[moduleId];
+			//auto tDiff = spirit.hime_tDiff[ihit] + posOffset[moduleId] / velocity[moduleId];
+			auto tDiff = spirit.hime_tDiff[ihit];
 
 			if (moduleId <= 1 || moduleId >= nModules) {
 				continue;
 			}
 
-			auto barPosition = tDiff * velocity[moduleId] * 10; // cm -> mm
+			//auto barPosition = tDiff * velocity[moduleId] * 10; // cm -> mm
+			auto barPosition = 0.5 * veff[moduleId] * tDiff + posOffset[moduleId];
 			double xHit = 0, yHit = 0;
 
 			// extra position offset due to the module we used to gate the tdiff
-			auto gatedMod = gatedModules[layerId][1];
-			auto extra_offset = modulePositions[gatedMod];
+			/* auto gatedMod = gatedModules[layerId][1];
+			auto extra_offset = modulePositions[gatedMod]; */
 
 			if (layerId == 0 || layerId == 2) {
-				xHit = barPosition + extra_offset;
+				//xHit = barPosition + extra_offset;
+				xHit = barPosition;
 				yHit = modulePositions[moduleId] + barWidth * (unif(gen) - 0.5);
 			} else {
-				yHit = barPosition + extra_offset;
+				//yHit = barPosition + extra_offset;
+				yHit = barPosition;
 				xHit = modulePositions[moduleId] + barWidth * (unif(gen) - 0.5);
 			}
 
@@ -346,43 +348,38 @@ unsigned int getLayer(const unsigned int &hitModule) {
 	return -1;
 }
 
-void loadTdiffOffset(
-	const std::string &filename, std::vector<double> &offset, std::vector<std::vector<double>> &gatedModules
-) {
 
-	offset.clear();
-	gatedModules.clear();
-	offset.resize(nModules, 0);
-	gatedModules.resize(nLayers);
-
-	if (filename == "") {
-		return;
-	}
-
-	if (!std::filesystem::exists(filename)) {
-		std::cerr << "Could not open file " << filename << std::endl;
-		return;
-	}
-
+void getPositionCalibration(const std::string &filename, std::vector<double> &veff, std::vector<double> &offset) {
 	std::ifstream infile(filename.c_str());
-	// load json file
+
+	assert(veff.size() == nModules);
+	assert(offset.size() == nModules);
+
+	for (int i = 0; i < nModules; i++) {
+		veff[i] = 0.0;
+		offset[i] = 0.0;
+	}
+
 	nlohmann::json j;
 	infile >> j;
+	infile.close();
 
-	for (auto i = 0; i < nModules; i++) {
-		offset[i] = j[std::to_string(i)];
-	}
-
-	for (auto i = 0; i < nLayers; i++) {
-		std::string key = "layer" + std::to_string(i) + "_gate";
-		auto mods = j[key];
-		for (auto mod : mods) {
-			gatedModules[i].push_back(mod);
+	for (int i = 0; i < nModules; i++) {
+		if (j.contains(std::to_string(i))) {
+			if (!j[std::to_string(i)].contains("v") || !j[std::to_string(i)].contains("offset")) {
+				continue; // skip if v or offset is not present
+			}
+			veff[i] = j[std::to_string(i)]["v"].get<double>();
+			offset[i] = j[std::to_string(i)]["offset"].get<double>();
+		} else {
+			std::cerr << "Module " << i << " not found in calibration file." << std::endl;
 		}
 	}
-
-	return;
 }
+////////////////////////////////
+
+
+
 
 std::vector<double> getModulePositions(const std::string &filename) {
 	std::vector<double> positions(nModules, 0);
@@ -393,7 +390,7 @@ std::vector<double> getModulePositions(const std::string &filename) {
 	}
 
 	infile.ignore(1000, '\n');
-	infile.ignore(1000, '\n');
+	//infile.ignore(1000, '\n');
 
 	int id, layer;
 	double pos;
@@ -439,3 +436,6 @@ void loadTofOffset(const std::string &filename, std::vector<double> &offset) {
 	}
 	return;
 }
+
+
+

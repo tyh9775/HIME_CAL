@@ -23,10 +23,6 @@ std::vector<double> getModulePositions(const std::string &filename);
 void loadTofOffset(const std::string &filename, std::vector<double> &offset);
 
 
-std::vector<std::vector<double>> lin_par_load(const std::string &linp);
-
-std::pair<std::vector<int>, std::vector<double*>> param_load(const std::string &pfile,int hbase,int hstart, int hstop); 
-
 
 void single(
 	// clang-format off

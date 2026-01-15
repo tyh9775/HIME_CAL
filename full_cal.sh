@@ -9,9 +9,9 @@
 set -e
 
 #switches for running different parts of the code
-original=false #run Kin's original code
+original=true #run Kin's original code
 mu_st=false #load and combine cosmic muon data
-single=true #run the single detector estimation
+single=false #run the single detector estimation
 load=false #for loading given data for calibration
 cal=false #for applying the calibration parameters
 recut=false #for automatically remaking tcutg files 
@@ -97,8 +97,8 @@ runs_all=$( IFS=, ; echo "${runs_all[*]}" )
 
 if [ $original == true ] 
 then
-    root -l -b -q "${sb_code_dir}/shadowAna.C({$runs}, \"${sb_res}-shadow-og.root\", true, false)"
-    root -l -b -q "${sb_code_dir}/shadowAna.C({$runs}, \"${sb_res}-shadow-vw-og.root\", true, true)"
+    root -l -b -q "${sb_code_dir}/shadowAna.C({$runs_all}, \"${result_dir}/og.root\", true, false)"
+    root -l -b -q "${sb_code_dir}/shadowAna.C({$runs_all}, \"${result_dir}/vw-og.root\", true, true)"
 fi
 
 if [ $mu_st == true ]
