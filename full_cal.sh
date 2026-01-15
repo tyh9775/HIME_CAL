@@ -21,30 +21,11 @@ ecal=false #creating E vs tot graphs
 read=1
 
 #switches for different output options
-Hel=true
+Hel=false
 
 
 #functions####################################################################################
 #function to pull out parameters from txt file
-get_params() {
-    local det_line="$1"
-    local file="$2"
-
-    local line
-    line=$(awk -v target="$det_line" '$0 == target {getline; print}' "$file")
-
-    if [[ -z $line ]]
-    then
-        echo "Line not found: $det_line"
-        return 1
-    fi
-
-    a1=$(echo "$line" | sed -E 's/a1: ([^+]+)\+.*a2: ([^+]+)\+.*ka: ([^+]+)\+.*/\1/')
-    a2=$(echo "$line" | sed -E 's/a1: ([^+]+)\+.*a2: ([^+]+)\+.*ka: ([^+]+)\+.*/\2/')
-    ka=$(echo "$line" | sed -E 's/a1: ([^+]+)\+.*a2: ([^+]+)\+.*ka: ([^+]+)\+.*/\3/')
-
-    echo "{$a1,$a2,$ka}"
-}
 
 get_double() {
     local header="$1"
@@ -133,32 +114,10 @@ then
     root -b -q -l "${tot_code_dir}/single_estimate.cpp(\"${result_dir}/single.root\",\"${mu_dir}/mu_ld.txt\",\"$s_est\",\"./TCuts/l\",$Hel)"
 fi
 
-a_pars=()   
-for det in "det 14" "det 38" "det 62"
-do
-    params=$(get_params "$det" "${ar_sc}.txt")
-    if [[ $? -eq 0 ]]
-    then
-        a_pars+=("$params")
-    fi
-done
-a_mat="{${a_pars[0]},${a_pars[1]},${a_pars[2]}}"
-
-a_pars_2=()   
-for det in "det 14 version 2" "det 38 version 2" "det 62 version 2"
-do
-    params=$(get_params "$det" "${ar_sc}.txt")
-    if [[ $? -eq 0 ]]
-    then
-        a_pars_2+=("$params")
-    fi
-done
-a_mat_2="{${a_pars_2[0]},${a_pars_2[1]},${a_pars_2[2]}}"
-
 
 if [ $load == 1 ]
 then   
-    #root -b -q -l "mult_loader_v3.cpp(\"${sb_res}-shadow-og.root\",\"ml.root\",{\"${cut_file1}\",\"${cut_file2}\",\"${cut_file3}\"})"
+    root -b -q -l "mult_loader.cpp(\"${sb_res}-shadow-og.root\",\"ml.root\",{\"${cut_file1}\",\"${cut_file2}\",\"${cut_file3}\"})"
     root -b -q -l "ToT_cal_v5.cpp(\"ml.root\",\"${ar_clb}\",\"$ar_par\",true,$a_mat)"
     root -b -q -l "ToT_cal_v5.cpp(\"ml.root\",\"${ar_clb_2}\",\"$ar_par_2\",true,$a_mat_2)"
 fi

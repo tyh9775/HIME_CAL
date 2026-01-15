@@ -33,6 +33,13 @@ double tri_pt {78.672};
 double hel_pt {168.557};
 double alp_pt {191.353};
 
+double pro_pt_err {1.9639};
+double deu_pt_err {1.7098};
+double tri_pt_err {1.5816};
+double hel_pt_err {2.3814};
+double alp_pt_err {2.2796};
+
+
 double cos_mu {8.0};
 double mu_tot0 {21.0};
 double mu_tot1 {19.5};
