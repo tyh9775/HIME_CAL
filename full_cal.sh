@@ -117,7 +117,7 @@ fi
 
 if [ $load == true ]
 then
-    root -b -q -l "${tot_code_dir}/mult_loader.cpp(\"${result_dir}/og.root\",\"${res_dir}/ml.root\",\"./TCuts/cal_l\")"
+    root -b -q -l "${tot_code_dir}/mult_loader.cpp(\"${result_dir}/og.root\",\"${res_dir}/ml.root\",\"./TCuts/cal_l\",false,true)"
     #root -b -q -l "ToT_cal.cpp(\"ml.root\",\"${ar_clb}\",\"$ar_par\",true,$a_mat)"
 
 fi

@@ -58,11 +58,11 @@ TH2D *htmp_make(const TH2D *h,const TCutG *cut){
 
 double y_pt_find(const TH2D *h,const TCutG *cut){
     TH2D *htmp = htmp_make(h,cut);
-    int xfix = htmp->GetXaxis()->FindBin(15.0);
+    int xfix = htmp->GetXaxis()->FindBin(18.0);
     TH1D *pytmp0 = htmp->ProjectionY("pytmp0",xfix,xfix);
     
     int max_ybin = pytmp0->GetMaximumBin();
-    double max_y = pytmp0->GetBinCenter(max_ybin);
+    double max_y = pytmp0->GetXaxis()->GetBinCenter(max_ybin);
     double max_count = pytmp0->GetBinContent(max_ybin);
 
     int y_low = pytmp0->FindFirstBinAbove(0);
@@ -207,7 +207,8 @@ void mult_loader(
             hcopy0 = (TH2D*)f->Get(Form("hTotVsTofBar%d",hbases[L]));
             //find the offset for the cuts of the detectors by using the first section
             TCutG *cut0 = (TCutG*)fcut->Get("cut_s0");
-            y0 = y_pt_find(hcopy0,cut0);         
+            y0 = y_pt_find(hcopy0,cut0);
+   
         } else {
             hcopy0 = (TH2D*)f->Get(Form("hTotVsTofBar_sh_t%d",hbases[L]));
             hcopy0->RebinY(5);
@@ -215,30 +216,30 @@ void mult_loader(
 
         std::vector<int> degrees {};
 
-        for (int j=0;j<num_sec;j++){
+        for (int j=1;j<num_sec;j++){
             /* if (std::find(sec_omit.begin(),sec_omit.end(),j+1) != sec_omit.end()){
                 degrees.push_back(0);
                 continue;
             } */
-            TCutG *cutj = (TCutG*)fcut->Get(Form("cut_s%d",j+1));
-            std::cout<<j<<"\n";
-            std::vector<std::vector<double>> data0 = data_load(hcopy0,cutj);
+            TCutG *cutj = (TCutG*)fcut->Get(Form("cut_s%d",j));
 
+            std::vector<std::vector<double>> data0 = data_load(hcopy0,cutj);
             double bic_start {1e6};
             int n_j = data0[0].size();            
             TGraphErrors* gj = new TGraphErrors(n_j,data0[0].data(),data0[1].data(),nullptr,data0[2].data());
             gj->SetName(Form("g_s%d_dbase",j+1));
             
+            
             int best_deg {0};
             TF1 *best_fit = nullptr;
             int dstrt {min_deg};
             int dstp {max_deg};
-            if (j==1 || j==2){
+            /* if (j==1 || j==2){
                 dstrt=2;
             } else if (j>=5){
                 dstrt=1;
                 dstp=1;
-            } 
+            } */
             for (int deg=dstrt;deg<=dstp;deg++){
                 TF1 *fit_f = new TF1(Form("fit_deg_%d",deg),Form("pol%d",deg),data0[0][0],data0[0][n_j-1]);
                 //fit_f->SetParLimits(0,-10,10);
@@ -262,6 +263,13 @@ void mult_loader(
             }
 
             degrees.push_back(best_deg);
+
+
+
+            /* TF1 *fit_f = new TF1("fit_f","pol2",data0[0][0],data0[0][n_j-1]);
+            fit_f->SetParameters(0,0,0);
+
+            gj->Fit(fit_f,"QR"); */
         }
 
 
@@ -304,7 +312,7 @@ void mult_loader(
 
             std::vector<TGraphErrors*> graphs {};
 
-            TCutG *cuti =(TCutG*)fcut->Get("cut_s1");
+            TCutG *cuti =(TCutG*)fcut->Get("cut_s0");
 
             double yi {0.0};
             double ydiff_i {0.0};
@@ -314,12 +322,12 @@ void mult_loader(
                 ydiff_i = y0-yi;
             }
 
-            for (int j=0;j<num_sec;j++){
+
+            for (int j=1;j<num_sec-1;j++){
                 /* if (std::find(sec_omit.begin(),sec_omit.end(),j+1) != sec_omit.end()){
                     continue;
-                }
- */
-                TCutG *cut_ini = (TCutG*)fcut->Get(("cut_s"+to_string(j+1)).c_str());
+                } */
+                TCutG *cut_ini = (TCutG*)fcut->Get(("cut_s"+to_string(j)).c_str());
                 TCutG *cut = (TCutG*)cut_ini->Clone();
 
                 cut = cut_adjust(cut_ini,ydiff_i);
@@ -339,7 +347,9 @@ void mult_loader(
                 TGraphErrors* gj = new TGraphErrors(n_j,data[0].data(),data[1].data(),nullptr,data[2].data());
                 gj->SetName(Form("g_s%d_d%d",j,i));
 
-                TF1 *fit_f = new TF1(Form("fit_deg_%d",degrees[j]),Form("pol%d",degrees[j]),data[0][0],data[0][n_j-1]);
+                TF1 *fit_f = new TF1(Form("fit_deg_%d",degrees[j-1]),Form("pol%d",degrees[j-1]),data[0][0],data[0][n_j-1]);
+                //TF1 *fit_f = new TF1("fit_f","pol2",data[0][0],data[0][n_j-1]);
+                fit_f->SetParameters(0,0,0);
 
                 std::cout<<"section "<<j<<" best fit"<<"\n";
                 gj->Fit(fit_f,"R");
