@@ -12,8 +12,8 @@ set -e
 original=false #run Kin's original code
 mu_st=false #load and combine cosmic muon data
 single=false #run the single detector estimation
-load=true #for loading given data for calibration
-tot_cal=false #for applying the calibration parameters
+load=false #for loading given data for calibration
+tot_cal=true #for applying the calibration parameters
 recut=false #for automatically remaking tcutg files 
 amp_e=false #calibrating amplitude to energy
 ecal=false #creating E vs tot graphs
