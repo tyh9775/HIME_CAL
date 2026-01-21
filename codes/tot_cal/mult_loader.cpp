@@ -176,7 +176,7 @@ void mult_loader(
     } */
 
     TH2D *h_all = new TH2D("hTotVsTof_all","",2000, -100, 300, 150, 0, 75);
-    for (int L=0;L<1;L++){
+    for (int L=0;L<3;L++){
         //Graphical cuts
         auto *fcut = new TFile((cut_pattern+to_string(L)+".root").c_str(),"READ");
         
@@ -361,12 +361,12 @@ void mult_loader(
 
             hLc->Add(hcut);
 
-            TCanvas *hc1 = new TCanvas(Form("hcopy%d",i),Form("hTotVsTof Det %d (log z)",i));
+            TCanvas *hc1 = new TCanvas(Form("hcopy%d",i),Form("hTotVsTof Det %d",i));
             hc1->cd();
             gPad->SetLogz();
             hcopy->Draw();
 
-            TCanvas *hc2 = new TCanvas(Form("hcut%d",i),Form("hTotVsTof Det %d (cut, log z)",i));
+            TCanvas *hc2 = new TCanvas(Form("hcut%d",i),Form("hTotVsTof Det %d",i));
             hc2->cd();
             gPad->SetLogz();
             hcut->Draw();

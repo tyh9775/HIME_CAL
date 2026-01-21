@@ -5,3 +5,5 @@ root -b -q -l "cut_load.cpp({\"l1s1.C\",\"l1s2.C\",\"l1s3.C\",\"l1s4.C\",\"l1s5.
 root -b -q -l "cut_load.cpp({\"l2s1.C\",\"l2s2.C\",\"l2s3.C\",\"l2s4.C\",\"l2s5.C\"},\"l2.root\")"
 
 root -b -q -l "cut_load.cpp({\"cl0s0.C\",\"cl0s1.C\",\"cl0s2.C\",\"cl0s3.C\",\"cl0s4.C\",\"cl0s5.C\"},\"cal_l0.root\")"
+root -b -q -l "cut_load.cpp({\"cl1s0.C\",\"cl1s1.C\",\"cl1s2.C\",\"cl1s3.C\",\"cl1s4.C\",\"cl1s5.C\"},\"cal_l1.root\")"
+root -b -q -l "cut_load.cpp({\"cl2s0.C\",\"cl2s1.C\",\"cl2s2.C\",\"cl2s3.C\",\"cl2s4.C\",\"cl2s5.C\"},\"cal_l2.root\")"

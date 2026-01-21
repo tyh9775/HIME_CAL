@@ -291,35 +291,24 @@ std::vector<std::vector<double>> data_load_f(const TGraphErrors *g, double start
 
 void ToT_cal_v5(
     const std::string &file = "input.root",
-    const std::string &ofile = "output.root",
-    const std::string &pfile = "parameters",
-    bool amp=false,
-    const std::vector<std::vector<double>> &parA_mat = {{a1,a2,ka},{a1,a2,ka},{a1,a2,ka}}
+    const std::string &ofile = "output",
+    const std::string &s_est = "single_est"
 ){
     //open loaded files
     auto *f = new TFile(file.c_str(),"READ");
     //create output file
-    auto *fo1 = new TFile(ofile.c_str(),"RECREATE");
-
+    auto *fo1 = new TFile((ofile+".root").c_str(),"RECREATE");
+    
     std::vector<int> hstarts {hstart1,hstart2,hstart3};
     std::vector<int> hstops {hstop1,hstop2,hstop3};
     std::vector<int> hbases {hbase1,hbase2,hbase3};
 
 
-
     //for saving the parameters
     std::ofstream param_output;
-    std::string pf1 = pfile+".txt";
-    param_output.open(pf1.c_str(),std::ios_base::trunc);
+    param_output.open((ofile+".txt").c_str(),std::ios_base::trunc);
 
     param_output << std::setw(8) << "Det Num " << std::setw(20) << "b1 "<< std::setw(20) << "b2 "<< std::setw(20) << "k "<< "\n";
-
-
-    std::ofstream param_output2;
-    std::string pf2 = pfile+"-f.txt";
-    param_output2.open(pf2.c_str(),std::ios_base::trunc);
-
-    param_output2 << std::setw(8) << "Det Num " << std::setw(20) << "b1 "<< std::setw(20) << "b2 "<< std::setw(20) << "k "<< "\n";
 
     for (int L=0;L<3;L++){
         std::vector<double> parA=parA_mat[L];

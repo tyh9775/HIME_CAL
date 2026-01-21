@@ -13,7 +13,7 @@ original=false #run Kin's original code
 mu_st=false #load and combine cosmic muon data
 single=false #run the single detector estimation
 load=true #for loading given data for calibration
-cal=false #for applying the calibration parameters
+tot_cal=false #for applying the calibration parameters
 recut=false #for automatically remaking tcutg files 
 amp_e=false #calibrating amplitude to energy
 ecal=false #creating E vs tot graphs
@@ -21,7 +21,7 @@ ecal=false #creating E vs tot graphs
 read=1
 
 #switches for different output options
-Hel=false
+Hel=true
 
 
 #functions####################################################################################
@@ -118,75 +118,10 @@ fi
 if [ $load == true ]
 then
     root -b -q -l "${tot_code_dir}/mult_loader.cpp(\"${result_dir}/og.root\",\"${res_dir}/ml.root\",\"./TCuts/cal_l\",false,true)"
-    #root -b -q -l "ToT_cal.cpp(\"ml.root\",\"${ar_clb}\",\"$ar_par\",true,$a_mat)"
-
 fi
 
-if [ $cal == 1 ]
+if [ $tot_cal == true ]
 then
-    root -b -q -l "amp_tot.C({$runs},\"$ar_a_t\",\"${ar_par}.txt\",true,false,$a_mat)"
-    root -b -q -l "amp_tot.C({$runs},\"$ar_a_t_2\",\"${ar_par_2}.txt\",true,false,$a_mat_2)"
+    root -b -q -l "${tot_code_dir}/ToT_cal.cpp(\"${res_dir}/ml.root\",\"${res_dir}/tclb\",\"$s_est\")"
 fi
 
-if [ $recut == 1 ]
-then
-    root -l -b -q "amp_cut_remaker.cpp({\"$tt_cut0\",\"$tt_cut1\",\"$tt_cut2\"},{\"$ar_cut0\",\"$ar_cut1\",\"$ar_cut2\"},$a_mat)"
-    root -l -b -q "amp_cut_remaker.cpp({\"$tt_cut0\",\"$tt_cut1\",\"$tt_cut2\"},{\"$ar_cut0_v2\",\"$ar_cut1_v2\",\"$ar_cut2_v2\"},$a_mat_2)"
-fi
-
-if [ $amp_e == 1 ]
-then 
-    root -l -b -q "amp_E_cal_v2.cpp(\"$ar_a_t\",\"mu_ld.txt\",\"$ar_ae\",{\"$ar_cut0\",\"$ar_cut1\",\"$ar_cut2\"},$a_mat,true,true,$En)" #set offset to 0
-    root -l -b -q "amp_E_cal_v2.cpp(\"$ar_a_t\",\"mu_ld.txt\",\"${ar_ae}-os\",{\"$ar_cut0\",\"$ar_cut1\",\"$ar_cut2\"},$a_mat,false,true,$En)" 
-
-    root -l -b -q "amp_E_cal_v2.cpp(\"$ar_a_t_2\",\"mu_ld.txt\",\"$ar_ae_2\",{\"$ar_cut0_v2\",\"$ar_cut1_v2\",\"$ar_cut2_v2\"},$a_mat_2,true,true,$En)" 
-    root -l -b -q "amp_E_cal_v2.cpp(\"$ar_a_t_2\",\"mu_ld.txt\",\"${ar_ae_2}-os\",{\"$ar_cut0_v2\",\"$ar_cut1_v2\",\"$ar_cut2_v2\"},$a_mat_2,false,true,$En)" 
-fi
-
-if [ $ecal == 1 ]
-then 
-    root -l -b -q "tot_simple_v3.cpp({$runs},\"${ar_sp}.root\",\"${ar_ae}.txt\",\"${ar_par}.txt\", true, false,$a_mat)"
-    root -l -b -q "tot_simple_v3.cpp({$runs},\"${ar_sp}_os.root\",\"${ar_ae}-os.txt\",\"${ar_par}.txt\", true, false,$a_mat)"
-
-    root -l -b -q "tot_simple_v3.cpp({$runs},\"${ar_sp_2}.root\",\"${ar_ae_2}.txt\",\"${ar_par_2}.txt\", true, false,$a_mat_2)"
-    root -l -b -q "tot_simple_v3.cpp({$runs},\"${ar_sp_2}_os.root\",\"${ar_ae_2}-os.txt\",\"${ar_par_2}.txt\", true, false,$a_mat_2)"
-fi
-
-if [ $vis == 1 ]
-then
-    root -l -b -q "visualize_simple.cpp(\"${ar_sp}.root\",\"${ar_sv}.root\")"
-    root -l -b -q "visualize_simple.cpp(\"${ar_sp}_os.root\",\"${ar_sv}_os.root\")"
-    
-    root -l -b -q "visualize_simple.cpp(\"${ar_sp_2}.root\",\"${ar_sv_2}.root\")"
-    root -l -b -q "visualize_simple.cpp(\"${ar_sp_2}_os.root\",\"${ar_sv_2}_os.root\")"
-fi
-
-if [ $read == 1 ]
-then
-    root -b -q -l "reader.cpp(\"${ar_sp}.root\",\"${vis_res}.root\",{\"$tt_cut0\",\"$tt_cut1\",\"$tt_cut2\"},{\"$E_cut0\",\"$E_cut1\",\"$E_cut2\"})"
-    root -b -q -l "reader.cpp(\"${ar_sp_2}.root\",\"${vis_res_2}.root\",{\"$tt_cut0\",\"$tt_cut1\",\"$tt_cut2\"},{\"$E_cut0\",\"$E_cut1\",\"$E_cut2\"})"
-
-    root -b -q -l "reader.cpp(\"${ar_sp}_os.root\",\"${vis_res}_os.root\",{\"$tt_cut0\",\"$tt_cut1\",\"$tt_cut2\"},{\"$E_cut0\",\"$E_cut1\",\"$E_cut2\"})"
-    root -b -q -l "reader.cpp(\"${ar_sp_2}_os.root\",\"${vis_res_2}_os.root\",{\"$tt_cut0\",\"$tt_cut1\",\"$tt_cut2\"},{\"$E_cut0\",\"$E_cut1\",\"$E_cut2\"})"
-fi
-
-
-if [ $muon == 1 ]
-then
-    root -b -q -l "muon_pts.cpp(\"ma.root\",\"${ar_mu}.root\",$a_mat,\"${ar_ae}.txt\")"
-    root -b -q -l "muon_pts.cpp(\"ma.root\",\"${ar_mu}-os.root\",$a_mat,\"${ar_ae}-os.txt\")"
-
-    root -b -q -l "muon_pts.cpp(\"ma.root\",\"${ar_mu_2}.root\",$a_mat_2,\"${ar_ae_2}.txt\")"
-    root -b -q -l "muon_pts.cpp(\"ma.root\",\"${ar_mu_2}-os.root\",$a_mat_2,\"${ar_ae_2}-os.txt\")"
-fi
-
-
-if [ $veto == 1 ]
-then
-    #root -l -b -q "tot_simple_v2.cpp({$runs},\"${amp_res}_simple_vw.root\",\"${amp_res}-amp-E-z.txt\",\"parameters_amp.txt\", true, true,{$a1, $a2, $ka})"
-    root -l -b -q "tot_simple_v3.cpp({$runs},\"${ar_sp}_vw.root\",\"${ar_ae}.txt\",\"${ar_par}.txt\", true, true,$a_mat)"
-    root -l -b -q "tot_simple_v3.cpp({$runs},\"${ar_sp}_os_vw.root\",\"${ar_ae}-os.txt\",\"${ar_par}.txt\", true, true,$a_mat)"
-
-    root -l -b -q "tot_simple_v3.cpp({$runs},\"${ar_sp_2}_vw.root\",\"${ar_ae_2}.txt\",\"${ar_par_2}.txt\", true, true,$a_mat_2)"
-    root -l -b -q "tot_simple_v3.cpp({$runs},\"${ar_sp_2}_os_vw.root\",\"${ar_ae_2}-os.txt\",\"${ar_par_2}.txt\", true, true,$a_mat_2)"
-fi

@@ -7,11 +7,11 @@
    cutg->SetVarY("");
    cutg->SetTitle("Graph");
    cutg->SetFillStyle(1000);
-   cutg->SetPoint(0,19.504,20.9525);
-   cutg->SetPoint(1,19.6244,24.0219);
-   cutg->SetPoint(2,11.1557,21.6966);
-   cutg->SetPoint(3,11.1155,18.6737);
-   cutg->SetPoint(4,18.5006,20.3247);
-   cutg->SetPoint(5,19.504,20.9525);
+   cutg->SetPoint(0,11.0918,27.1763);
+   cutg->SetPoint(1,14.8267,30.7791);
+   cutg->SetPoint(2,15.6756,30.7791);
+   cutg->SetPoint(3,15.5058,27.2285);
+   cutg->SetPoint(4,11.5162,24.6699);
+   cutg->SetPoint(5,11.0918,27.1763);
    cutg->Draw("");
 }
