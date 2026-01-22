@@ -13,10 +13,9 @@ original=false #run Kin's original code
 mu_st=false #load and combine cosmic muon data
 single=false #run the single detector estimation
 load=false #for loading given data for calibration
-tot_cal=true #for applying the calibration parameters
-recut=false #for automatically remaking tcutg files 
-amp_e=false #calibrating amplitude to energy
-ecal=false #creating E vs tot graphs
+tot_cal=false #for finding the tot calibration parameters
+e_cal=true #apply tot calibration and find amp to energy parameters
+
 
 read=1
 
@@ -107,7 +106,8 @@ then
     root -b -q -l "${tot_code_dir}/muon_load.cpp(\"${mu_dir}/ma.root\",\"${mu_dir}/mu_ld\")"
 fi
 
-
+#assuming that the amp and energy are about the same for all detectors
+#parameters are about 1 and 0
 if [ $single == true ] 
 then
     #root -b -q -l "${tot_code_dir}/single.cpp({$runs_all},\"${result_dir}/single.root\",{14,38,62},true,false)"
@@ -123,5 +123,13 @@ fi
 if [ $tot_cal == true ]
 then
     root -b -q -l "${tot_code_dir}/ToT_cal.cpp(\"${res_dir}/ml.root\",\"${res_dir}/tclb\",\"$s_est\")"
+    root -b -q -l "${tot_code_dir}/recut.cpp(\"./TCuts/cal_l\",\"$s_est\")"
+fi
+
+#no longer assuming the parameters of amp to energy are 1 and 0
+
+if [ $e_cal == true ]
+then
+
 fi
 

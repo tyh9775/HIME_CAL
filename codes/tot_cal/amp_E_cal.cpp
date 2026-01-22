@@ -149,11 +149,11 @@ double avg_find(std::vector<double> v){
 
 
 double f_exp(double ToT,const std::vector<double> &parA){
-    return parA[0]*exp(parA[2]*ToT)+parA[1];
+    return parA[0]*exp(parA[1]*ToT)+parA[2];
 }
 
 double f_der(double ToT,const std::vector<double> &parA){
-    return parA[0]*parA[2]*exp(parA[2]*ToT);
+    return parA[0]*parA[1]*exp(parA[1]*ToT);
 }
 
 std::vector<double> mu_read(const std::string &tfile,int det){
@@ -183,17 +183,13 @@ std::vector<double> mu_read(const std::string &tfile,int det){
 
 
 
-void amp_E_cal_v2(
-    const std::string &file = "input.root",
-    const std::string &tfile = "input.txt",
+void amp_E_cal(
+    const std::string &file = "input",
     const std::string &ofile = "output",
-    const std::vector<std::string> &cuts = {"cut1.root","cut2.root","cut3.root"},
-    const std::vector<std::vector<double>> &parA_mat = {{a1,a2,ka},{a1,a2,ka},{a1,a2,ka}},
-    bool limit = false,
-    bool He = false,
-    const double E_min = En_min //set negative if ignoring
+    const std::string &cut_pattern = "TCuts/cal_l",
+    bool He = false
 ){
-    TFile *f = new TFile(file.c_str(),"READ");
+    TFile *f = new TFile((file+".root").c_str(),"READ");
     std::string oroot;
     oroot = ofile+".root";
     TFile *fo1 = new TFile(oroot.c_str(),"RECREATE");
