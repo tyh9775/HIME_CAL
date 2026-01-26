@@ -267,9 +267,7 @@ void ToT_cal(
     //create output file
     auto *fo1 = new TFile((ofile+".root").c_str(),"RECREATE");
     
-    std::vector<int> hstarts {hstart1,hstart2,hstart3};
-    std::vector<int> hstops {hstop1,hstop2,hstop3};
-    std::vector<int> hbases {hbase1,hbase2,hbase3};
+
 
     //load estimated parameters
     std::vector<std::vector<double>> parA_mat = parA_load((s_est+".txt"))[0];

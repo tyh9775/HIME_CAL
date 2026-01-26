@@ -119,6 +119,11 @@ int hstop3 {71};
 int hbase3 {62};
 
 
+std::vector<int> hstarts {hstart1,hstart2,hstart3};
+std::vector<int> hstops {hstop1,hstop2,hstop3};
+std::vector<int> hbases {hbase1,hbase2,hbase3};
+
+
 //sections
 //{1,2,3,4,5,6,7};
 std::vector<int> sec_omit {1,6,7}; //change which sections to omit

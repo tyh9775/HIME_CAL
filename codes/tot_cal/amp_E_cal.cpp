@@ -8,6 +8,9 @@
 #include <TF1.h>
 #include <TStyle.h>
 
+
+//code to calibrate amp to energy after ToT calibration
+
 std::vector<double> cut_range(const TCutG *c){
     double xmax = c->GetPointX(0);
     double xmin = c->GetPointX(0);
