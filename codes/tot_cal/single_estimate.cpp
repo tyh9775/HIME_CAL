@@ -60,14 +60,13 @@ void single_estimate(
 
     std::vector<std::vector<double>> tofs {L0_tof,L1_tof,L2_tof};
     
-    std::vector<double> pnch_pts {cos_mu, pro_pt, deu_pt, tri_pt}; //energies to be used for parameter estimation
-    std::vector<double> pnch_pts_err {0.1, pro_pt_err, deu_pt_err, tri_pt_err};
+    std::vector<double> pnch_pts = pt_ens; //energies to be used for parameter estimation
+    std::vector<double> pnch_pts_err = pt_errs;
     int num_sec=3;
+    pnch_pts.insert(pnch_pts.begin(),cos_mu);
+    pnch_pts_err.insert(pnch_pts_err.begin(),0.1);
+
     if (He){
-        pnch_pts.push_back(hel_pt);
-        pnch_pts.push_back(alp_pt);
-        pnch_pts_err.push_back(hel_pt_err);
-        pnch_pts_err.push_back(alp_pt_err);
         num_sec=5;
     }
 
@@ -149,18 +148,22 @@ void single_estimate(
 
     }
 
-    /* for (size_t i=0;i<tots.size();i++){
+    for (size_t i=0;i<tots.size();i++){
         std::cout<<"Detector "<<hbases[i]<<":"<<"\n";
         for (size_t j=0;j<tots[i].size();j++){
             std::cout<<"\t"<<tots[i][j]<<"\t"<<tots_errs[i][j];
+            std::cout<<"\t|\t";
+            std::cout<<pnch_pts[j]<<"\n";
         }
         std::cout<<"\n";
+
     }
-    */
+   
 
     for (int i=0;i<3;i++){
         TCanvas *c = new TCanvas(Form("c_E_vs_ToT_det%d",hbases[i]),Form("Det %d",hbases[i]));
-        TGraphErrors *g = new TGraphErrors(tots[i].size(),&tots[i][0],&pnch_pts[0],&tots_errs[i][0],&pnch_pts_err[0]);
+//        TGraphErrors *g = new TGraphErrors(tots[i].size(),&tots[i][0],&pnch_pts[0],&tots_errs[i][0],&pnch_pts_err[0]);
+        TGraphErrors *g = new TGraphErrors(tots[i].size(),tots[i].data(),pnch_pts.data(),tots_errs[i].data(),pnch_pts_err.data());
         g->SetTitle(Form("Energy vs ToT Det %d",hbases[i]));
         g->GetXaxis()->SetTitle("ToT (ns)");
         g->GetXaxis()->SetLimits(0,40);
@@ -175,21 +178,87 @@ void single_estimate(
         //E=C*amp+D
         //assuming C=1 and D=0 for simplicity
 
-        TF1 *f1 = new TF1("f1", "[0]*exp([1]*x)+[2]",0,40);
+        f1 = new TF1("f1", "[0]*exp([1]*x)+[2]",0,40);
         f1->SetParameters(1,0.1,0);
         f1->SetParLimits(0,0,100);
         f1->SetParLimits(1,0,1);
         f1->SetParLimits(2,0,100);
+
+        /* TF1 *f1 = nullptr;
+        if (He){
+            f1 = new TF1("f1", "[3]*([0]*exp([1]*x)+[2])+[4]",0,40);
+            f1->SetParameters(1,0.1,0,1,0);
+            f1->SetParLimits(0,0,100);
+            f1->SetParLimits(1,0,1);
+            f1->SetParLimits(2,0,100);
+            f1->SetParLimits(3,0,100);
+            f1->SetParLimits(4,0,50);
+
+        } else {
+            f1 = new TF1("f1", "[0]*exp([1]*x)+[2]",0,40);
+            f1->SetParameters(1,0.1,0);
+            f1->SetParLimits(0,0,100);
+            f1->SetParLimits(1,0,1);
+            f1->SetParLimits(2,0,100);
+        } */
+
+        
+        
         g->Fit(f1,"RQ");
 
         fo1->cd();
         c->Write();
-
         output<<std::setw(10)<<f1->GetParameter(0)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(0)<<"\t"
-              <<std::setw(10)<<f1->GetParameter(1)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(1)<<"\t"
-              <<std::setw(10)<<f1->GetParameter(2)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(2)<<"\n";
+        <<std::setw(10)<<f1->GetParameter(1)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(1)<<"\t"
+        <<std::setw(10)<<f1->GetParameter(2)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(2)<<"\n";
+
+        /* if (He){
+            output<<std::setw(10)<<f1->GetParameter(0)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(0)<<"\t"
+            <<std::setw(10)<<f1->GetParameter(1)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(1)<<"\t"
+            <<std::setw(10)<<f1->GetParameter(2)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(2)<<"\t"
+            <<std::setw(10)<<f1->GetParameter(3)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(3)<<"\t"
+            <<std::setw(10)<<f1->GetParameter(4)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(4)<<"\n";
+        } else {
+            output<<std::setw(10)<<f1->GetParameter(0)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(0)<<"\t"
+            <<std::setw(10)<<f1->GetParameter(1)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(1)<<"\t"
+            <<std::setw(10)<<f1->GetParameter(2)<<std::setw(5)<<" +/- "<<std::setw(10)<<f1->GetParError(2)<<"\n";
+        } */
+
     }
 
+    std::vector<std::vector<double>> tots_check {L0_tot,L1_tot,L2_tot};
+    for (int i=0;i<3;i++){
+        TCanvas *c1 = new TCanvas(Form("c_check_%d",hbases[i]), "");
+        c1->cd();
+        TH2D *h = (TH2D*)f->Get(Form("hTotVsTof_det%d",hbases[i]))->Clone();
+        h->Draw();
+        TGraph *g = new TGraph(tots_check[0].size(),tofs[i].data(),tots_check[i].data());
+        g->SetMarkerStyle(20);
+        g->SetMarkerColor(kRed);
+        g->Draw("P SAME");
+        fo1->cd();
+        c1->Write();
+
+        TCanvas *c2 = new TCanvas(Form("c_%d",hbases[i]), "");
+        c2->cd();
+        h->Draw();
+        std::vector<double> tots_i = tots[i];
+        std::vector<double> tots_err_i = tots_errs[i];
+        tots_i.erase(tots_i.begin());
+        tots_err_i.erase(tots_err_i.begin());
+        TGraphErrors *g2 = new TGraphErrors(tots_i.size(),tofs[i].data(),tots_i.data(),nullptr,tots_err_i.data());
+        g2->SetMarkerStyle(20);
+        g2->SetMarkerColor(kRed);
+        g2->Draw("P SAME");
+        TFile *fcut = new TFile((cut_pattern+std::to_string(i)+".root").c_str(),"READ");
+        for (int j=0;j<num_sec;j++){
+            TCutG *cut = (TCutG*)fcut->Get(Form("cut_s%d",j));
+            cut->Draw("SAME");
+        }
+        fo1->cd();
+        c2->Write();
+
+    }
 
 
     output.close();

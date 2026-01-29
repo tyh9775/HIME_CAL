@@ -1,13 +1,19 @@
 {
 //========= Macro generated from object: CUTG/Graph
-//========= by ROOT version6.36.04
+//========= by ROOT version6.33.01
    
-   std::vector<Double_t> cutg_vect4{ 31.39649005921126, 33.32306601915157, 34.37392563366446, 34.54906890274995, 31.57163332829674, 31.04620352104029, 31.39649005921126 };
-   std::vector<Double_t> cutg_vect5{ 27.24815791333585, 27.16763159634644, 26.57710527175744, 20.8060525541831, 20.96710518816192, 26.71131580007312, 27.24815791333585 };
-   auto *cutg = new TCutG("CUTG", 7, cutg_vect4.data(), cutg_vect5.data());
+   TCutG *cutg = new TCutG("CUTG",8);
    cutg->SetVarX("");
    cutg->SetVarY("");
    cutg->SetTitle("Graph");
    cutg->SetFillStyle(1000);
-   cutg->Draw();
+   cutg->SetPoint(0,31.1246,26.4818);
+   cutg->SetPoint(1,32.14,27.41);
+   cutg->SetPoint(2,35.1185,25.6985);
+   cutg->SetPoint(3,35.0734,23.0007);
+   cutg->SetPoint(4,32.8395,24.7993);
+   cutg->SetPoint(5,31.5082,24.0741);
+   cutg->SetPoint(6,31.1471,24.1031);
+   cutg->SetPoint(7,31.1246,26.4818);
+   cutg->Draw("");
 }

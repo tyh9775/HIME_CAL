@@ -33,72 +33,59 @@ double tri_pt {78.672};
 double hel_pt {168.557};
 double alp_pt {191.353};
 
+std::vector<double> pt_ens {pro_pt,deu_pt,tri_pt,hel_pt,alp_pt};
+
 double pro_pt_err {1.9639};
 double deu_pt_err {1.7098};
 double tri_pt_err {1.5816};
 double hel_pt_err {2.3814};
 double alp_pt_err {2.2796};
 
+std::vector<double> pt_errs {pro_pt_err,deu_pt_err,tri_pt_err,hel_pt_err,alp_pt_err};
 
 double cos_mu {8.0};
 double mu_tot0 {21.0};
 double mu_tot1 {19.5};
 double mu_tot2 {20.5};
 
-
-//punch through tof estimated by eye
-double pro_tof_0 {25.4};
-double deu_tof_0 {32.6};
-double tri_tof_0 {37.2};
-double hel_tof_0 {20.8};
-double alp_tof_0 {23.4};
-
-double pro_tof_1 {21.4};
-double deu_tof_1 {27.8};
-double tri_tof_1 {32.2};
-double hel_tof_1 {17.6};
-double alp_tof_1 {20.0};
-
-double pro_tof_2 {19.2};
-double deu_tof_2 {25.2};
-double tri_tof_2 {29.2};
-double hel_tof_2 {15.4};
-double alp_tof_2 {17.6};
-
-
 //BC408 can detect x rays of energies <100keV (around 10% E res around here)
 double En_min {0.1};
 double En_min_err {0.01};
 
 double num_ent = 13215485.0;
-//punch though points (estimated by eye)
 
-std::vector<double> pro_0 {25.4,25.5};
+//punch though points (estimated by eye)
+std::vector<double> pro_0 {25.4,25.7};
 std::vector<double> deu_0 {32.8,26.4};
 std::vector<double> tri_0 {37.8,27.1};
-std::vector<double> hel_0 {21.4,29.7};
+std::vector<double> hel_0 {21.0,30.0};
 std::vector<double> alp_0 {23.8,30.8};
 
-std::vector<double> pro_1 {21.8,24.3};
-std::vector<double> deu_1 {28.4,25.5};
-std::vector<double> tri_1 {33.2,26.1};
-std::vector<double> hel_1 {18.0,28.5};
-std::vector<double> alp_1 {20.4,29.4};
+std::vector<double> pro_1 {21.4,24.2};
+std::vector<double> deu_1 {27.8,25.2};
+std::vector<double> tri_1 {32.4,25.9};
+std::vector<double> hel_1 {17.8,28.4};
+std::vector<double> alp_1 {20.0,29.2};
 
-std::vector<double> pro_2 {19.6,25.0};
-std::vector<double> deu_2 {25.6,25.8};
-std::vector<double> tri_2 {30.2,26.7};
-std::vector<double> hel_2 {16.0,29.6};
-std::vector<double> alp_2 {18.4,30.1};
+std::vector<double> pro_2 {19.0,24.9};
+std::vector<double> deu_2 {25.2,25.9};
+std::vector<double> tri_2 {29.4,26.6};
+std::vector<double> hel_2 {15.4,29.3};
+std::vector<double> alp_2 {17.6,30.4};
 
-/* std::vector<double> L0_tof {pro_0[0],deu_0[0],tri_0[0],hel_0[0],alp_0[0]};
+std::vector<double> L0_tof {pro_0[0],deu_0[0],tri_0[0],hel_0[0],alp_0[0]};
 std::vector<double> L1_tof {pro_1[0],deu_1[0],tri_1[0],hel_1[0],alp_1[0]};
-std::vector<double> L2_tof {pro_2[0],deu_2[0],tri_2[0],hel_2[0],alp_2[0]}; */
+std::vector<double> L2_tof {pro_2[0],deu_2[0],tri_2[0],hel_2[0],alp_2[0]};
 
-std::vector<double> L0_tof {pro_tof_0,deu_tof_0,tri_tof_0,hel_tof_0,alp_tof_0};
+std::vector<double> L0_tot {pro_0[1],deu_0[1],tri_0[1],hel_0[1],alp_0[1]};
+std::vector<double> L1_tot {pro_1[1],deu_1[1],tri_1[1],hel_1[1],alp_1[1]};
+std::vector<double> L2_tot {pro_2[1],deu_2[1],tri_2[1],hel_2[1],alp_2[1]};
+
+
+/* std::vector<double> L0_tof {pro_tof_0,deu_tof_0,tri_tof_0,hel_tof_0,alp_tof_0};
 std::vector<double> L1_tof {pro_tof_1,deu_tof_1,tri_tof_1,hel_tof_1,alp_tof_1};
 std::vector<double> L2_tof {pro_tof_2,deu_tof_2,tri_tof_2,hel_tof_2,alp_tof_2};
-
+ */
 
 // (m/ns)^2 = (J/kg)/(10^-9)^2 = (6241509074461 MeV / 6.0221366516752E+26 u) * (10^18) = 10364.27673 MeV/u
 //conversion factor

@@ -330,9 +330,21 @@ void single(
 	}
 
 	auto ofile = new TFile(outputFilename.c_str(), "recreate");
+	std::vector<std::vector<double>> pt_tofs {L0_tof, L1_tof, L2_tof};
+	std::vector<std::vector<double>> pt_tots {L0_tot, L1_tot, L2_tot};
+
 	for (size_t i=0;i<mod_check.size();i++){
 		ofile->cd();
 		hTotVsTof_det[i]->Write();
+		TGraph *g1 = new TGraph(pt_tofs[i].size(), pt_tofs[i].data(), pt_tots[i].data());
+		TCanvas *c1 = new TCanvas(Form("c_tot_tof_det%d",mod_check[i]), "");
+		c1->cd();
+		gPad->SetLogz();
+		hTotVsTof_det[i]->Draw();
+		g1->SetMarkerStyle(20);
+		g1->SetMarkerColor(kRed);
+		g1->Draw("P SAME");
+		c1->Write();
 	}
 	ofile->Close();
 

@@ -11,13 +11,11 @@ set -e
 #switches for running different parts of the code
 original=false #run Kin's original code
 mu_st=false #load and combine cosmic muon data
-single=false #run the single detector estimation
+single=true #run the single detector estimation
 load=false #for loading given data for calibration
 tot_cal=false #for finding the tot calibration parameters
-tc_app=true #apply tot cal to runs
+tc_app=false #apply tot cal to runs
 e_cal=false #apply tot calibration and find amp to energy parameters
-
-read=1
 
 #switches for different output options
 Hel=true
@@ -126,13 +124,12 @@ then
     root -b -q -l "${tot_code_dir}/recut.cpp(\"./TCuts/cal_l\",\"$s_est\")"
 fi
 
-#apply tot cal parameters to generate new tot vs tof graphs
+#apply tot cal parameters to generate new tot vs tof and E vs tof plots
 if [ $tc_app == true ]
 then
-    root -b -q -l "${tot_code_dir}/tot_cal_apply.C({$runs_all},\"${res_dir}/all_tot_cal.root\",\"${res_dir}/tclb.txt\",true,false)"
+    root -b -q -l "${tot_code_dir}/cal_apply.C({$runs_all},\"${res_dir}/all_tot_cal.root\",\"${res_dir}/tclb.txt\",true,false)"
 fi
 
-#no longer assuming the parameters of amp to energy are 1 and 0
 
 if [ $e_cal == true ]
 then

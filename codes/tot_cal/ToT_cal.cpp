@@ -200,13 +200,13 @@ std::unique_ptr<ROOT::Math::Minimizer> min_func(const std::vector<double>& ToT1,
 
     min_1->SetFunction(f1);
     min_1->SetVariable(0,"A_adj",A,0.1); 
-    min_1->SetVariable(1,"k_adj",k,0.1);
-    min_1->SetVariable(2,"B_adj",B,0.01);
+    min_1->SetVariable(1,"k_adj",k,0.01);
+    min_1->SetVariable(2,"B_adj",B,0.1);
 
 
     min_1->SetVariableLimits(0,0.0,1.0);
     min_1->SetVariableLimits(1,0.0,1.0);
-    min_1->SetVariableLimits(2,0.0,1.0);
+    min_1->SetVariableLimits(2,0.0,5.0);
 
     min_1->Minimize();
 

@@ -45,12 +45,17 @@ std::vector<std::vector<std::vector<double>>> parA_load(const std::string &s_est
 
 void recut(
     const std::string &cut_pat = "pattern",
-    const std::string &pfile = "parA"
+    const std::string &pfile = "parA",
+    bool Hel = false
 
 ){
     for (int l=0;l<3;l++){
         TFile *f = new TFile((cut_pat+std::to_string(l)+".root").c_str(),"READ");
-        TFile *fo1 = new TFile((cut_pat+std::to_string(l)+"_new.root").c_str(),"RECREATE");
+        std::string cnew = cut_pat+std::to_string(l)+"_new";
+        if (Hel){
+            cnew += "_Hel";
+        }
+        TFile *fo1 = new TFile((cnew+".root").c_str(),"RECREATE");
         std::vector<double> aparam = parA_load((pfile+".txt").c_str())[0][l];
         std::cout<<aparam[0]<<" "<<aparam[1]<<" "<<aparam[2]<<"\n";
 

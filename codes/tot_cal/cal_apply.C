@@ -25,7 +25,7 @@ void loadTofOffset(const std::string &filename, std::vector<double> &offset);
 
 std::vector<std::vector<double>> par_load(const std::string &text_file);
 
-double f_cal(const double *param, double ToT, const double *parA);
+std::vector<double> f_cal(const double *param, double ToT, const double *parA);
 
 //////////////////////////////////////////////////////////////////////
 
@@ -41,7 +41,7 @@ struct tot_params {
 };
 
 
-void tot_cal_apply(
+void cal_apply(
 	// clang-format off
     const std::vector<int> runIds = {
 
@@ -120,26 +120,42 @@ void tot_cal_apply(
 
 	auto hBdcXY = new TH2D("hBdcXY", "", 200, -100, 100, 200, -100, 100);
 	auto hBdcXYCut = new TH2D("hBdcXYCut", "", 200, -100, 100, 200, -100, 100);
-	auto hTotVSTof_cal = new TH2D("hTotVSTof_cal", "", 2000, -100, 300, 150, 0, 75);
+	auto hTotVsTof_cal = new TH2D("hTotVsTof_cal", "", 2000, -100, 300, 750, 0, 75);
 	auto hHitPattern = new TH2D("hHitPattern", "", hitPatternBins, -1000, 1000, hitPatternBins, -1000, 1000);
 	auto hBarHitPattern = new TH2D("hBarHitPattern", "", hitPatternBins, -1000, 1000, 72, 0, 72);
 	TH2D *hHitPatternLayer[3];
+	TH2D *hTotVsTofLayer[3];
+	TH2D *hTotVsTofLayer_cal[3];
+
+	TH2D *hEnVsTofLayer[3];
+
+	TH2D *hEnVsTofLayer_cal[3];
+
 	for (int i = 0; i < 3; i++) {
 		hHitPatternLayer[i] =
 			new TH2D(Form("hHitPatternLayer%d", i), "", hitPatternBins, -1000, 1000, hitPatternBins, -1000, 1000);
 		hHitPatternLayer[i]->Sumw2();
+
+		hTotVsTofLayer[i] = new TH2D(Form("hTotVsTofLayer%d", i), "", 2000, -100, 300, 750, 0, 75);
+		hTotVsTofLayer[i]->Sumw2();
+		hTotVsTofLayer_cal[i] = new TH2D(Form("hTotVsTofLayer%d_cal", i), "", 2000, -100, 300, 750, 0, 75);
+		hTotVsTofLayer_cal[i]->Sumw2();
+		hEnVsTofLayer[i] = new TH2D(Form("hEnVsTofLayer%d", i), "", 2000, -100, 300, 1500, 0, 300);
+		hEnVsTofLayer[i]->Sumw2();
+		hEnVsTofLayer_cal[i] = new TH2D(Form("hEnVsTofLayer%d_cal", i), "", 2000, -100, 300, 1500, 0, 300);
+		hEnVsTofLayer_cal[i]->Sumw2();
 	}
 	TH1D *hBarHit[72];
 
 	TH2D *hTotVsTofBar_cal[72];
 	for (int i = 0; i < 72; i++) {
-		hTotVsTofBar_cal[i] = new TH2D(Form("hTotVsTofBar%d_cal", i), "", 2000, -100, 300, 150, 0, 75);
+		hTotVsTofBar_cal[i] = new TH2D(Form("hTotVsTofBar%d_cal", i), "", 2000, -100, 300, 750, 0, 75);
 		hTotVsTofBar_cal[i]->Sumw2();
 	}
 
 	hBdcXY->Sumw2();
 	hBdcXYCut->Sumw2();
-	hTotVSTof_cal->Sumw2();
+	hTotVsTof_cal->Sumw2();
 	hHitPattern->Sumw2();
 	hBarHitPattern->Sumw2();
 
@@ -236,8 +252,10 @@ void tot_cal_apply(
 				par_i[pi] = cal_pars[moduleId][pi];
 				parA[pi] = cal_pars[hbases[layerId]][pi]; //using det0's A parameters for all
 			}
-			
-			double tot_new = f_cal(par_i,tot,parA);
+
+			double En = f_cal(par_i,tot,parA)[0];			
+			double tot_new = f_cal(par_i,tot,parA)[1];
+			double En_cal = f_cal(par_i,tot,parA)[2];
 
 			//auto barPosition = tDiff * velocity[moduleId] * 10; // cm -> mm
 			auto barPosition = 0.5 * veff[moduleId] * tDiff + posOffset[moduleId];
@@ -304,7 +322,13 @@ void tot_cal_apply(
 
 
 			hTotVsTofBar_cal[moduleId]->Fill(tof, tot_new);
-			hTotVSTof_cal->Fill(tof, tot_new);
+			hTotVsTof_cal->Fill(tof, tot_new);
+			hTotVsTofLayer[layerId]->Fill(tof, tot);
+			hTotVsTofLayer_cal[layerId]->Fill(tof, tot_new);
+
+			hEnVsTofLayer[layerId]->Fill(tof, En);
+			hEnVsTofLayer_cal[layerId]->Fill(tof, En_cal);
+
 			hHitPattern->Fill(xHit, yHit);
 			hBarHitPattern->Fill(layerId == 0 || layerId == 2 ? xHit : yHit, moduleId);
 			hHitPatternLayer[layerId]->Fill(xHit, yHit);
@@ -312,11 +336,15 @@ void tot_cal_apply(
 	}
 
 	hBdcXY->Scale(1. / spiritEntries);
-	hTotVSTof_cal->Scale(1. / spiritEntries);
+	hTotVsTof_cal->Scale(1. / spiritEntries);
 	hHitPattern->Scale(1. / spiritEntries);
 	hBarHitPattern->Scale(1. / spiritEntries);
 	for (int i = 0; i < 3; i++) {
 		hHitPatternLayer[i]->Scale(1. / spiritEntries);
+		hTotVsTofLayer[i]->Scale(1. / spiritEntries);
+		hTotVsTofLayer_cal[i]->Scale(1. / spiritEntries);
+		hEnVsTofLayer[i]->Scale(1. / spiritEntries);
+		hEnVsTofLayer_cal[i]->Scale(1. / spiritEntries);
 	}
 
 	for (int i = 0; i < 72; i++) {
@@ -328,11 +356,34 @@ void tot_cal_apply(
 	auto ofile = new TFile(outputFilename.c_str(), "recreate");
 	hBdcXY->Write();
 	hBdcXYCut->Write();
-	hTotVSTof_cal->Write();
+	hTotVsTof_cal->Write();
 	hHitPattern->Write();
 	hBarHitPattern->Write();
+
+	std::vector<std::vector<double>> pt_tofs {L0_tof, L1_tof, L2_tof};
+
 	for (int i = 0; i < 3; i++) {
 		hHitPatternLayer[i]->Write();
+		hTotVsTofLayer[i]->Write();
+		hTotVsTofLayer_cal[i]->Write();
+		hEnVsTofLayer[i]->Write();
+		hEnVsTofLayer_cal[i]->Write();
+		TCanvas *c1 = new TCanvas(Form("cEnVsTofLayer%d", i), Form("cEnVsTofLayer%d", i));
+		TCanvas *c2 = new TCanvas(Form("cEnVsTofLayer%d_cal", i), Form("cEnVsTofLayer%d_cal", i));
+		c1->cd();
+		gPad->SetLogz();
+		hEnVsTofLayer[i]->Draw();
+		TGraph *g1 = new TGraph(pt_tofs[i].size(), pt_tofs[i].data(), pt_ens.data());
+		g1->SetMarkerStyle(20);
+		g1->SetMarkerColor(kRed);
+		g1->Draw("SAME P");
+		c2->cd();
+		gPad->SetLogz();
+		hEnVsTofLayer_cal[i]->Draw();
+		g1->Draw("SAME P");
+
+		c1->Write();
+		c2->Write();
 	}
 	for (int i = 0; i < 72; i++) {
 		hBarHit[i]->Write();
@@ -497,7 +548,7 @@ std::vector<std::vector<double>> par_load(const std::string &text_file){
 }
 
 
-double f_cal(const double *param, double ToT, const double *parA){
+std::vector<double> f_cal(const double *param, double ToT, const double *parA){
     double A_adj {param[0]};
     double k_adj {param[1]};
     double B_adj {param[2]};
@@ -506,10 +557,11 @@ double f_cal(const double *param, double ToT, const double *parA){
     double k=parA[1];
     double B=parA[2];
 
+	double En {A*exp(k*ToT)+B};
+    double En_cal {A_adj*exp(k_adj*ToT)+B_adj};
 
-    double En {A_adj*exp(k_adj*ToT)+B_adj};
-    double ToT_cal {log((En-B)/A)/k};
+    double ToT_cal {log((En_cal-B)/A)/k};
 
-    return ToT_cal;
+    return {En, ToT_cal, En_cal};
 }
 
