@@ -177,14 +177,15 @@ void single_estimate(
         //recall amp=A*exp(k*tot)+B
         //E=C*amp+D
         //assuming C=1 and D=0 for simplicity
-
+        TF1 *f1 = nullptr;
+        
         f1 = new TF1("f1", "[0]*exp([1]*x)+[2]",0,40);
         f1->SetParameters(1,0.1,0);
         f1->SetParLimits(0,0,100);
         f1->SetParLimits(1,0,1);
         f1->SetParLimits(2,0,100);
 
-        /* TF1 *f1 = nullptr;
+        /* 
         if (He){
             f1 = new TF1("f1", "[3]*([0]*exp([1]*x)+[2])+[4]",0,40);
             f1->SetParameters(1,0.1,0,1,0);
@@ -202,8 +203,6 @@ void single_estimate(
             f1->SetParLimits(2,0,100);
         } */
 
-        
-        
         g->Fit(f1,"RQ");
 
         fo1->cd();
@@ -228,7 +227,7 @@ void single_estimate(
 
     std::vector<std::vector<double>> tots_check {L0_tot,L1_tot,L2_tot};
     for (int i=0;i<3;i++){
-        TCanvas *c1 = new TCanvas(Form("c_check_%d",hbases[i]), "");
+        TCanvas *c1 = new TCanvas(Form("c_set_%d",hbases[i]), "");
         c1->cd();
         TH2D *h = (TH2D*)f->Get(Form("hTotVsTof_det%d",hbases[i]))->Clone();
         h->Draw();
@@ -239,7 +238,7 @@ void single_estimate(
         fo1->cd();
         c1->Write();
 
-        TCanvas *c2 = new TCanvas(Form("c_%d",hbases[i]), "");
+        TCanvas *c2 = new TCanvas(Form("c_found_%d",hbases[i]), "");
         c2->cd();
         h->Draw();
         std::vector<double> tots_i = tots[i];

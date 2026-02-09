@@ -18,7 +18,7 @@ tc_app=false #apply tot cal to runs
 e_cal=false #apply tot calibration and find amp to energy parameters
 
 #switches for different output options
-Hel=true
+Hel=false
 
 
 #functions####################################################################################
