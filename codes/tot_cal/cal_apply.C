@@ -27,6 +27,8 @@ std::vector<std::vector<double>> par_load(const std::string &text_file);
 
 std::vector<double> f_cal(const double *param, double ToT, const double *parA);
 
+std::vector<double> f_cal_inv(const double *parA, std::vector<double> En_list);
+
 //////////////////////////////////////////////////////////////////////
 
 
@@ -250,7 +252,7 @@ void cal_apply(
 			double parA[3];
 			for (int pi=0;pi<3;pi++){
 				par_i[pi] = cal_pars[moduleId][pi];
-				parA[pi] = cal_pars[hbases[layerId]][pi]; //using det0's A parameters for all
+				parA[pi] = cal_pars[hbases[layerId]][pi];
 			}
 
 			double En = f_cal(par_i,tot,parA)[0];			
@@ -361,6 +363,9 @@ void cal_apply(
 	hBarHitPattern->Write();
 
 	std::vector<std::vector<double>> pt_tofs {L0_tof, L1_tof, L2_tof};
+
+
+	std::vector<double> tot_check_list = f_cal_inv()
 
 	for (int i = 0; i < 3; i++) {
 		hHitPatternLayer[i]->Write();
@@ -563,5 +568,22 @@ std::vector<double> f_cal(const double *param, double ToT, const double *parA){
     double ToT_cal {log((En_cal-B)/A)/k};
 
     return {En, ToT_cal, En_cal};
+}
+
+
+std::vector<double> f_cal_inv( const double *parA, std::vector<double> En){
+
+    double A=parA[0];
+    double k=parA[1];
+    double B=parA[2];
+
+	double ToT_list {};
+
+	for (size_t i=0;i<En.size();i++){
+		ToT_list.push_back(log((En[i]-B)/A)/k)	
+	}
+
+
+    return ToT_list;
 }
 

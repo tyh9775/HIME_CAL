@@ -11,11 +11,11 @@ set -e
 #switches for running different parts of the code
 original=false #run Kin's original code
 mu_st=false #load and combine cosmic muon data
-single=true #run the single detector estimation
+single=false #run the single detector estimation
 load=false #for loading given data for calibration
 tot_cal=false #for finding the tot calibration parameters
 tc_app=false #apply tot cal to runs
-e_cal=false #apply tot calibration and find amp to energy parameters
+e_cal=true #apply tot calibration and find amp to energy parameters
 
 #switches for different output options
 Hel=false
